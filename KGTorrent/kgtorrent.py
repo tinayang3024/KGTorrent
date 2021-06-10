@@ -129,6 +129,12 @@ def main():
         print("*******************************")
         print("** NOTEBOOK DOWNLOAD STARTED **")
         print("*******************************")
+        # nb_identifiers = {
+        # UserName
+        # CurrentUrlSlug
+        # CurrentKernelVersionId
+        #}
+        #
         downloader = Downloader(nb_identifiers, config.nb_archive_path)
         print(f'# Selected strategy. {args.strategy}')
         downloader.download_notebooks(strategy=args.strategy)

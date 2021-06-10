@@ -71,6 +71,7 @@ Temporary Items
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.venv
 
 # Generated files
 .idea/**/contentModel.xml

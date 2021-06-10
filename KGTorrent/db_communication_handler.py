@@ -494,6 +494,7 @@ class DbCommunicationHandler:
                 'INNER JOIN kernellanguages ON kernelversions.ScriptLanguageId = kernellanguages.Id) ' \
                 f'WHERE '
 
+        query = query + f'('
         # Add where clause for each language
         for lang in languages:
 
@@ -502,6 +503,10 @@ class DbCommunicationHandler:
 
             else:
                 query = query + f'OR kernellanguages.name LIKE \'{lang}\' '
+
+        query = query + f')'
+        # Select forks only
+        query = query + f'AND (kernelversions.LinesInsertedFromFork > 0 OR kernelversions.LinesChangedFromFork > 0 OR kernelversions.LinesDeletedFromFork > 0) ORDER BY kernelversions.TotalVotes desc LIMIT 50'
 
         # Close the query
         query = query + ';'

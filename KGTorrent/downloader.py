@@ -8,7 +8,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 import requests
-from kaggle.api.kaggle_api_extended import KaggleApi
+# from kaggle.api.kaggle_api_extended import KaggleApi
 
 # Imports for testing
 import KGTorrent.config as config
@@ -127,40 +127,40 @@ class Downloader:
             # Wait a bit to avoid a potential IP banning
             time.sleep(1)
 
-    def _api_download(self):
-        """
-        This method implements the API download strategy.
-        """
-
-        # Initialization and authentication
-        # It's need kaggle.json token in ~/.kaggle
-        api = KaggleApi()
-        api.authenticate()
-
-        self._n_successful_downloads = 0
-        self._n_failed_downloads = 0
-
-        for row in tqdm(self._nb_identifiers.itertuples(), total=self._nb_identifiers.shape[0]):
-
-            # noinspection PyBroadException
-            try:
-                api.kernels_pull(f'{row[1]}/{row[2]}', path=Path(self._nb_archive_path))
-
-                # Kaggle API save notebook only with slug name
-                # Rename downloaded notebook to username/slug
-                nb = Path(self._nb_archive_path + f'/{row[2]}.ipynb')
-                nb.rename(self._nb_archive_path + f'/{row[1]}_{row[2]}.ipynb')
-
-            except Exception:
-                logging.exception(f'An error occurred while requesting the notebook {row[1]}/{row[2]}')
-                self._n_failed_downloads += 1
-                continue
-
-            self._n_successful_downloads += 1
-            logging.info(f'Downloaded {row[1]}/{row[2]} (ID: {row[3]})')
-
-            # Wait a bit to avoid a potential IP banning
-            time.sleep(1)
+    # def _api_download(self):
+    #     """
+    #     This method implements the API download strategy.
+    #     """
+    #
+    #     # Initialization and authentication
+    #     # It's need kaggle.json token in ~/.kaggle
+    #     api = KaggleApi()
+    #     api.authenticate()
+    #
+    #     self._n_successful_downloads = 0
+    #     self._n_failed_downloads = 0
+    #
+    #     for row in tqdm(self._nb_identifiers.itertuples(), total=self._nb_identifiers.shape[0]):
+    #
+    #         # noinspection PyBroadException
+    #         try:
+    #             api.kernels_pull(f'{row[1]}/{row[2]}', path=Path(self._nb_archive_path))
+    #
+    #             # Kaggle API save notebook only with slug name
+    #             # Rename downloaded notebook to username/slug
+    #             nb = Path(self._nb_archive_path + f'/{row[2]}.ipynb')
+    #             nb.rename(self._nb_archive_path + f'/{row[1]}_{row[2]}.ipynb')
+    #
+    #         except Exception:
+    #             logging.exception(f'An error occurred while requesting the notebook {row[1]}/{row[2]}')
+    #             self._n_failed_downloads += 1
+    #             continue
+    #
+    #         self._n_successful_downloads += 1
+    #         logging.info(f'Downloaded {row[1]}/{row[2]} (ID: {row[3]})')
+    #
+    #         # Wait a bit to avoid a potential IP banning
+    #         time.sleep(1)
 
     def download_notebooks(self, strategy='HTTP'):
         """
@@ -201,7 +201,7 @@ class Downloader:
 
 
 if __name__ == '__main__':
-
+    num_notebooks = 20
     print(f"## Connecting to {config.db_name} db on port {config.db_port} as user {config.db_username}")
     db_engine = DbCommunicationHandler(config.db_username,
                                        config.db_password,
@@ -212,7 +212,10 @@ if __name__ == '__main__':
     print("** QUERING KERNELS TO DOWNLOAD **")
     kernels_ids = db_engine.get_nb_identifiers(config.nb_conf['languages'])
 
-    downloader = Downloader(kernels_ids.head(), config.nb_archive_path)
+    downloader = Downloader(kernels_ids.head(num_notebooks), config.nb_archive_path)
+    # todo: get URLs directly from dataframe (not priority)
+    kernels_ids.head(num_notebooks).to_excel("notebooks_info.xlsx")
+
     strategies = 'HTTP', 'API'
 
     print("*******************************")
