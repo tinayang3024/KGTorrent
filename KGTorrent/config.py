@@ -32,10 +32,10 @@ nb_conf = {
 
 # Logging Configuration
 #log_path = os.environ['LOG_DEST_PATH']
-log_path = "./logs/"
-# logging.basicConfig(
-#     filename=os.path.join(log_path, f'{time.time()}.log'),
-#     filemode='w',
-#     level=logging.INFO,
-#     format='[%(levelname)s]\t%(asctime)s - %(message)s'
-# )
+log_path = "C:/Users/jimmy/Documents/GitHub/KGTorrent/logs"
+logging.basicConfig(
+    filename=os.path.join(log_path, f'{time.time()}.log'),
+    filemode='w',
+    level=logging.INFO,
+    format='[%(levelname)s]\t%(asctime)s - %(message)s'
+)
