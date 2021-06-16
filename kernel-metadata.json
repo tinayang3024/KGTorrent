@@ -1,0 +1,21 @@
+{
+  "id": "zhengminyang/common-data-random-forest",
+  "id_no": 14920613,
+  "title": "Common Data Random Forest",
+  "code_file": "common-data-random-forest.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "keywords": [
+    "gpu"
+  ],
+  "dataset_sources": [
+    "zhengminyang/rapids",
+    "zhengminyang/wids2021training",
+    "zhengminyang/wids2021trainingfull"
+  ],
+  "kernel_sources": [],
+  "competition_sources": []
+}

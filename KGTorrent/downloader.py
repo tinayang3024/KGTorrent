@@ -104,7 +104,23 @@ class Downloader:
             # Download notebook content to memory
             # noinspection PyBroadException
             try:
-                notebook = requests.get(url, allow_redirects=True, timeout=5)
+
+                # cookies = {
+                #     '.ASPXAUTH': '7516769A1C8A8FE81812467ABC3B801EA35B55F32761F27BA27A2F2AC992F856C07757302E3165502C19EE3E4E232023C9AC85B7E9225F6370D8A971A4E85AF48A142A4B2554053190BEB19B485CD0403DD4F4F8',
+                #     'ka_sessionid': 'e179d3cb492015052b50858ff1c529e0aab117c9',
+                #     '_ga': 'GA1.2.908532115.1613499167',
+                # }
+
+                cookies = {
+                    '.ASPXAUTH': 'B5F3B128DB6EA47602D87C55FCCEEC1174D936241E39FAD21C339029A8D32C674469A32412B5C2531277BD0CA6D89F93CE1456E4AC0ECFF2DE5DB3C3AF40C3912E002B3B81A2A43ECCD3312125CA1B067BEE3F82',
+                    'CLIENT_TOKEN': 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpc3MiOiJrYWdnbGUiLCJhdWQiOiJjbGllbnQiLCJzdWIiOiJ5YW5nemhtOSIsIm5idCI6IjIwMjEtMDYtMTZUMTM6MDQ6MTkuMzA0NzY1NVoiLCJpYXQiOiIyMDIxLTA2LTE2VDEzOjA0OjE5LjMwNDc2NTVaIiwianRpIjoiYWU2M2UyZWEtZTdjNi00ODU2LTg4MzYtMTBkMDE5NzhlMjFmIiwiZXhwIjoiMjAyMS0wNy0xNlQxMzowNDoxOS4zMDQ3NjU1WiIsInVpZCI6NzcwMTY0NCwiZmYiOlsiRG9ja2VyTW9kYWxTZWxlY3RvciIsIkFjdGl2ZUV2ZW50cyIsIkdjbG91ZEtlcm5lbEludGVnIiwiS2VybmVsRWRpdG9yQ29yZ2lNb2RlIiwiQ2FpcEV4cG9ydCIsIkNhaXBOdWRnZSIsIktlcm5lbHNGaXJlYmFzZUxvbmdQb2xsaW5nIiwiS2VybmVsc1ByZXZlbnRTdG9wcGVkVG9TdGFydGluZ1RyYW5zaXRpb24iLCJLZXJuZWxzUG9sbFF1b3RhIiwiS2VybmVsc1F1b3RhTW9kYWxzIiwiRGF0YXNldHNEYXRhRXhwbG9yZXJWM1RyZWVMZWZ0IiwiQXZhdGFyUHJvZmlsZVByZXZpZXciLCJEYXRhc2V0c0RhdGFFeHBsb3JlclYzQ2hlY2tGb3JVcGRhdGVzIiwiRGF0YXNldHNEYXRhRXhwbG9yZXJWM0NoZWNrRm9yVXBkYXRlc0luQmFja2dyb3VuZCIsIktlcm5lbHNTdGFja092ZXJmbG93U2VhcmNoIiwiS2VybmVsc01hdGVyaWFsTGlzdGluZyIsIkRhdGFzZXRzTWF0ZXJpYWxEZXRhaWwiLCJEYXRhc2V0c01hdGVyaWFsTGlzdENvbXBvbmVudCIsIkNvbXBldGl0aW9uRGF0YXNldHMiLCJEaXNjdXNzaW9uc1Vwdm90ZVNwYW1XYXJuaW5nIiwiVGFnc0V4cGVyaW1lbnRVSSIsIlRhZ3NMZWFybkFuZERpc2N1c3Npb25zVUkiLCJOb1JlbG9hZEV4cGVyaW1lbnQiLCJOb3RlYm9va3NMYW5kaW5nUGFnZSIsIkRhdGFzZXRzRnJvbUdjcyIsIktlcm5lbHNMZXNzUmFwaWRBdXRvU2F2ZSIsIkJvb2ttYXJrc1VJIiwiQ29tcGV0aXRpb25zS21MYW5kaW5nIiwiS2VybmVsVmlld2VySGlkZUZha2VFeGl0TG9nVGltZSIsIkRhdGFzZXRMYW5kaW5nUGFnZVJvdGF0aW5nU2hlbHZlcyIsIkxlYXJuTGFuZGluZ0RlZmF1bHRMaXN0IiwiTG93ZXJEYXRhc2V0SGVhZGVySW1hZ2VNaW5SZXMiLCJLTUxlYXJuTGFuZGluZ1Rlc3QiLCJLTUxlYXJuTGFuZGluZ1Rlc3RWZXJzaW9uQiJdLCJwaWQiOiJrYWdnbGUtMTYxNjA3Iiwic3ZjIjoid2ViLWZlIiwic2RhayI6IkFJemFTeUE0ZU5xVWRSUnNrSnNDWldWei1xTDY1NVhhNUpFTXJlRSIsImJsZCI6IjFjZWJjYWI3MzE3YTliNmE3ZDBlYzFhODcyZjliMjU1YWJiNDk0ZWUifQ.',
+                    'CSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL-rc_MPdQcdtoBW_kqIfNB4nb3crEEsu-zP4FDu7eUG0NVjxpJTjKKf26Z4jn4dJPhK3zuzDMBSXBikURsxihBt-BqemwilMYb9OzcYFS_NxMiuxzw8GxMI55o8j5043fM',
+                    'GCLB': 'CMD9leLQ89DSWQ',
+                    'XSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL9EXj1aRzsJYexhTpDahviZq6sLZpNuKKdmpYClv_Iy6DRK28QRmLHbYYiw2WnGhX7IrALBkJb0xyeC63nn1E0p3wIkpeHF2O2wWkTtD79THSHoiNKKC7iJDNTACWWwzY2o7ZXHPopMfigvM8RW6rpAfxbs7vu3v_YFMqGQA9ZmeA',
+                    'ka_sessionid': 'd1fc32396914f933968b1a422c2b348d',
+                }
+
+                notebook = requests.get(url, allow_redirects=True, timeout=5, cookies=cookies)
 
             except requests.exceptions.HTTPError:
                 logging.exception(f'HTTPError while requesting the notebook at: "{url}"')
@@ -204,7 +220,7 @@ class Downloader:
 
 
 if __name__ == '__main__':
-    num_notebooks = 20
+    num_notebooks = 10
     print(f"## Connecting to {config.db_name} db on port {config.db_port} as user {config.db_username}")
     db_engine = DbCommunicationHandler(config.db_username,
                                        config.db_password,
@@ -213,14 +229,15 @@ if __name__ == '__main__':
                                        config.db_name)
 
     print("** QUERING KERNELS TO DOWNLOAD **")
-    kernels_ids = db_engine.get_nb_identifiers(config.nb_conf['languages'])
+    kernels_ids = db_engine.get_nb_identifiers(config.nb_conf['languages'], num_notebooks=num_notebooks)
 
-    downloader = Downloader(kernels_ids.head(num_notebooks), config.nb_archive_path)
-    # todo: get URLs directly from dataframe (not priority)
-    kernels_ids.head(num_notebooks).to_excel("notebooks_info.xlsx")
+    #downloader = Downloader(kernels_ids.head(num_notebooks), config.nb_archive_path)
+    #kernels_ids.head(num_notebooks).to_excel("notebooks_info.xlsx")
+    downloader = Downloader(kernels_ids, config.nb_archive_path)
+    kernels_ids.to_excel("notebooks_info.xlsx")
 
-    #strategies = 'HTTP', 'API'
-    strategies = 'API', 'HTTP'
+    strategies = 'HTTP', 'API'
+    #strategies = 'API', 'HTTP'
 
     print("*******************************")
     print("** NOTEBOOK DOWNLOAD STARTED **")
