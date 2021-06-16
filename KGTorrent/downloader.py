@@ -220,7 +220,7 @@ class Downloader:
 
 
 if __name__ == '__main__':
-    num_notebooks = 10
+    num_repos = 10
     print(f"## Connecting to {config.db_name} db on port {config.db_port} as user {config.db_username}")
     db_engine = DbCommunicationHandler(config.db_username,
                                        config.db_password,
@@ -229,7 +229,7 @@ if __name__ == '__main__':
                                        config.db_name)
 
     print("** QUERING KERNELS TO DOWNLOAD **")
-    kernels_ids = db_engine.get_nb_identifiers(config.nb_conf['languages'], num_notebooks=num_notebooks)
+    kernels_ids = db_engine.get_nb_identifiers(config.nb_conf['languages'], num_notebooks=num_repos)
 
     #downloader = Downloader(kernels_ids.head(num_notebooks), config.nb_archive_path)
     #kernels_ids.head(num_notebooks).to_excel("notebooks_info.xlsx")
