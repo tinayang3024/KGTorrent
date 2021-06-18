@@ -484,9 +484,9 @@ class DbCommunicationHandler:
         """
 
         # Prepare the query
-        query = 'select users.UserName, all_top_versions.versionnum as CurrentUrlSlug, all_top_versions.versionid from ' \
+        query = 'select concat(users.UserName, \'_\', all_top_versions.nbtitle) as UserName, all_top_versions.versionnum as CurrentUrlSlug, all_top_versions.versionid from ' \
                 '((users join ' \
-                '(select kernelversions.AuthorUserId as userid, kernelversions.VersionNumber as versionnum, kernelversions.Id as versionid, kernelversions.ScriptLanguageId as language from ' \
+                '(select kernelversions.AuthorUserId as userid, kernelversions.Title as nbtitle, kernelversions.VersionNumber as versionnum, kernelversions.Id as versionid, kernelversions.ScriptLanguageId as language from ' \
                 'kernelversions join ' \
                 '(select kernelversions.AuthorUserId, kernelversions.ScriptId, kernelversions.VersionNumber from kernelversions join ' \
                 '(select AuthorUserId, ScriptId, max(TotalVotes) as MaxVotes from kernelversions group by AuthorUserId, ScriptId) as MaxPossible ' \

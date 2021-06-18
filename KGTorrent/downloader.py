@@ -14,6 +14,8 @@ from kaggle.api.kaggle_api_extended import KaggleApi
 import KGTorrent.config as config
 from KGTorrent.db_communication_handler import DbCommunicationHandler
 
+import glob
+import os
 
 class Downloader:
     """
@@ -82,21 +84,28 @@ class Downloader:
                             (self._nb_identifiers['UserName'] == split[0]) &
                             (self._nb_identifiers['CurrentUrlSlug'] == split[1]))]
                 else:  # remove the notebook
-                    print('Removing notebook', name, ' not found in db')
-                    path.unlink()
+                    #print('Removing notebook', name, ' not found in db')
+                    #path.unlink()
+                    pass
 
             else:  # remove the notebook
-                print('Removing notebook', name, ' not valid')
-                path.unlink()
+                #print('Removing notebook', name, ' not valid')
+                #path.unlink()
+                pass
 
-    def _http_download(self):
+    def _http_download(self, skip=0):
         """
         This method implements the HTTP download strategy.
         """
         self._n_successful_downloads = 0
         self._n_failed_downloads = 0
+        idx = -1
 
         for row in tqdm(self._nb_identifiers.itertuples(), total=self._nb_identifiers.shape[0]):
+            idx += 1
+            if idx < skip:
+                self._n_successful_downloads += 1
+                continue
 
             # Generate URL
             url = 'https://www.kaggle.com/kernels/scriptcontent/{}/download'.format(row[3])
@@ -112,11 +121,11 @@ class Downloader:
                 # }
 
                 cookies = {
-                    '.ASPXAUTH': 'B5F3B128DB6EA47602D87C55FCCEEC1174D936241E39FAD21C339029A8D32C674469A32412B5C2531277BD0CA6D89F93CE1456E4AC0ECFF2DE5DB3C3AF40C3912E002B3B81A2A43ECCD3312125CA1B067BEE3F82',
-                    'CLIENT_TOKEN': 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpc3MiOiJrYWdnbGUiLCJhdWQiOiJjbGllbnQiLCJzdWIiOiJ5YW5nemhtOSIsIm5idCI6IjIwMjEtMDYtMTZUMTM6MDQ6MTkuMzA0NzY1NVoiLCJpYXQiOiIyMDIxLTA2LTE2VDEzOjA0OjE5LjMwNDc2NTVaIiwianRpIjoiYWU2M2UyZWEtZTdjNi00ODU2LTg4MzYtMTBkMDE5NzhlMjFmIiwiZXhwIjoiMjAyMS0wNy0xNlQxMzowNDoxOS4zMDQ3NjU1WiIsInVpZCI6NzcwMTY0NCwiZmYiOlsiRG9ja2VyTW9kYWxTZWxlY3RvciIsIkFjdGl2ZUV2ZW50cyIsIkdjbG91ZEtlcm5lbEludGVnIiwiS2VybmVsRWRpdG9yQ29yZ2lNb2RlIiwiQ2FpcEV4cG9ydCIsIkNhaXBOdWRnZSIsIktlcm5lbHNGaXJlYmFzZUxvbmdQb2xsaW5nIiwiS2VybmVsc1ByZXZlbnRTdG9wcGVkVG9TdGFydGluZ1RyYW5zaXRpb24iLCJLZXJuZWxzUG9sbFF1b3RhIiwiS2VybmVsc1F1b3RhTW9kYWxzIiwiRGF0YXNldHNEYXRhRXhwbG9yZXJWM1RyZWVMZWZ0IiwiQXZhdGFyUHJvZmlsZVByZXZpZXciLCJEYXRhc2V0c0RhdGFFeHBsb3JlclYzQ2hlY2tGb3JVcGRhdGVzIiwiRGF0YXNldHNEYXRhRXhwbG9yZXJWM0NoZWNrRm9yVXBkYXRlc0luQmFja2dyb3VuZCIsIktlcm5lbHNTdGFja092ZXJmbG93U2VhcmNoIiwiS2VybmVsc01hdGVyaWFsTGlzdGluZyIsIkRhdGFzZXRzTWF0ZXJpYWxEZXRhaWwiLCJEYXRhc2V0c01hdGVyaWFsTGlzdENvbXBvbmVudCIsIkNvbXBldGl0aW9uRGF0YXNldHMiLCJEaXNjdXNzaW9uc1Vwdm90ZVNwYW1XYXJuaW5nIiwiVGFnc0V4cGVyaW1lbnRVSSIsIlRhZ3NMZWFybkFuZERpc2N1c3Npb25zVUkiLCJOb1JlbG9hZEV4cGVyaW1lbnQiLCJOb3RlYm9va3NMYW5kaW5nUGFnZSIsIkRhdGFzZXRzRnJvbUdjcyIsIktlcm5lbHNMZXNzUmFwaWRBdXRvU2F2ZSIsIkJvb2ttYXJrc1VJIiwiQ29tcGV0aXRpb25zS21MYW5kaW5nIiwiS2VybmVsVmlld2VySGlkZUZha2VFeGl0TG9nVGltZSIsIkRhdGFzZXRMYW5kaW5nUGFnZVJvdGF0aW5nU2hlbHZlcyIsIkxlYXJuTGFuZGluZ0RlZmF1bHRMaXN0IiwiTG93ZXJEYXRhc2V0SGVhZGVySW1hZ2VNaW5SZXMiLCJLTUxlYXJuTGFuZGluZ1Rlc3QiLCJLTUxlYXJuTGFuZGluZ1Rlc3RWZXJzaW9uQiJdLCJwaWQiOiJrYWdnbGUtMTYxNjA3Iiwic3ZjIjoid2ViLWZlIiwic2RhayI6IkFJemFTeUE0ZU5xVWRSUnNrSnNDWldWei1xTDY1NVhhNUpFTXJlRSIsImJsZCI6IjFjZWJjYWI3MzE3YTliNmE3ZDBlYzFhODcyZjliMjU1YWJiNDk0ZWUifQ.',
-                    'CSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL-rc_MPdQcdtoBW_kqIfNB4nb3crEEsu-zP4FDu7eUG0NVjxpJTjKKf26Z4jn4dJPhK3zuzDMBSXBikURsxihBt-BqemwilMYb9OzcYFS_NxMiuxzw8GxMI55o8j5043fM',
-                    'GCLB': 'CMD9leLQ89DSWQ',
-                    'XSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL9EXj1aRzsJYexhTpDahviZq6sLZpNuKKdmpYClv_Iy6DRK28QRmLHbYYiw2WnGhX7IrALBkJb0xyeC63nn1E0p3wIkpeHF2O2wWkTtD79THSHoiNKKC7iJDNTACWWwzY2o7ZXHPopMfigvM8RW6rpAfxbs7vu3v_YFMqGQA9ZmeA',
+                    '.ASPXAUTH': '2656A0B5422BFF8AF3E2FE87BBB9D34666563EEA51C5AEBDC483A737B52B1A26A10596ABAB84E815A566896C040999059571590A2391B86FB544FDA27696FC98F9176387B91FC644E4316BC0D1348444DD1C11EF',
+                    'CLIENT_TOKEN': 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpc3MiOiJrYWdnbGUiLCJhdWQiOiJjbGllbnQiLCJzdWIiOiJ6aGVuZ21pbnlhbmciLCJuYnQiOiIyMDIxLTA2LTE3VDE4OjU2OjUwLjY0MjEwMjRaIiwiaWF0IjoiMjAyMS0wNi0xN1QxODo1Njo1MC42NDIxMDI0WiIsImp0aSI6IjU0YWNiYjU1LTUxMjAtNDljMi04ZGMwLWYzMDgwZGJiZTBiNyIsImV4cCI6IjIwMjEtMDctMTdUMTg6NTY6NTAuNjQyMTAyNFoiLCJ1aWQiOjY0OTk2NTQsImZmIjpbIkRvY2tlck1vZGFsU2VsZWN0b3IiLCJBY3RpdmVFdmVudHMiLCJHY2xvdWRLZXJuZWxJbnRlZyIsIktlcm5lbEVkaXRvckNvcmdpTW9kZSIsIkNhaXBFeHBvcnQiLCJDYWlwTnVkZ2UiLCJLZXJuZWxzRmlyZWJhc2VMb25nUG9sbGluZyIsIktlcm5lbHNQcmV2ZW50U3RvcHBlZFRvU3RhcnRpbmdUcmFuc2l0aW9uIiwiS2VybmVsc1BvbGxRdW90YSIsIktlcm5lbHNRdW90YU1vZGFscyIsIkRhdGFzZXRzRGF0YUV4cGxvcmVyVjNUcmVlTGVmdCIsIkF2YXRhclByb2ZpbGVQcmV2aWV3IiwiRGF0YXNldHNEYXRhRXhwbG9yZXJWM0NoZWNrRm9yVXBkYXRlcyIsIkRhdGFzZXRzRGF0YUV4cGxvcmVyVjNDaGVja0ZvclVwZGF0ZXNJbkJhY2tncm91bmQiLCJLZXJuZWxzU3RhY2tPdmVyZmxvd1NlYXJjaCIsIktlcm5lbHNNYXRlcmlhbExpc3RpbmciLCJEYXRhc2V0c01hdGVyaWFsRGV0YWlsIiwiRGF0YXNldHNNYXRlcmlhbExpc3RDb21wb25lbnQiLCJDb21wZXRpdGlvbkRhdGFzZXRzIiwiRGlzY3Vzc2lvbnNVcHZvdGVTcGFtV2FybmluZyIsIlRhZ3NFeHBlcmltZW50VUkiLCJUYWdzTGVhcm5BbmREaXNjdXNzaW9uc1VJIiwiTm9SZWxvYWRFeHBlcmltZW50IiwiTm90ZWJvb2tzTGFuZGluZ1BhZ2UiLCJEYXRhc2V0c0Zyb21HY3MiLCJLZXJuZWxzTGVzc1JhcGlkQXV0b1NhdmUiLCJMZWFybkxhbmRpbmdLTSIsIkJvb2ttYXJrc1VJIiwiQm9va21hcmtzQ29tcHNVSSIsIkNvbXBldGl0aW9uc0ttTGFuZGluZyIsIktlcm5lbFZpZXdlckhpZGVGYWtlRXhpdExvZ1RpbWUiLCJEYXRhc2V0TGFuZGluZ1BhZ2VSb3RhdGluZ1NoZWx2ZXMiLCJMZWFybkxhbmRpbmdEZWZhdWx0TGlzdCIsIkxvd2VyRGF0YXNldEhlYWRlckltYWdlTWluUmVzIiwiS01MZWFybkxhbmRpbmdUZXN0IiwiS01MZWFybkxhbmRpbmdUZXN0VmVyc2lvbkIiXSwicGlkIjoia2FnZ2xlLTE2MTYwNyIsInN2YyI6IndlYi1mZSIsInNkYWsiOiJBSXphU3lBNGVOcVVkUlJza0pzQ1pXVnotcUw2NTVYYTVKRU1yZUUiLCJibGQiOiJkYmRlYTQyODYwMjM4ZTZiY2EwM2QyMTUzZmYzZTdmMTc3OWNmNDYxIn0.',
+                    'CSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL-GSFUhhm55gMh4qVwgoN6VcDzKRJu3BLX1PwHQj_jDW3PMQCeYY5W5CPG95xBYbpByaLDMttyWHqKMy2HSbPXCKlRnRyFir3hjJnDwK3uBjCIGLWb05E6MmbE84eYkQC4',
+                    'GCLB': 'CJ60sbjq3tGpUA',
+                    'XSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL8vmotCo64cSevITk9iGUEAclAfItyAq4mjPpRL4if23Ly-EPLqU3XnnSwB3_dOwR1nqM77PGzNnD5cqKPoiHIAM1Jl8LDu0UJulcu7XjsRJEwnHI-DD4JAzoPJJ3RIQeemnCqryHRYpJLSSSb_eQcqvDXaMbGSPw0yS7nHkHqYbA',
                     'ka_sessionid': 'd1fc32396914f933968b1a422c2b348d',
                 }
 
@@ -141,7 +150,7 @@ class Downloader:
             logging.info(f'Downloaded {row[1]}/{row[2]} (ID: {row[3]})')
 
             # Wait a bit to avoid a potential IP banning
-            time.sleep(1)
+            time.sleep(10)
 
     def _api_download(self):
         """
@@ -178,12 +187,13 @@ class Downloader:
             # Wait a bit to avoid a potential IP banning
             time.sleep(1)
 
-    def download_notebooks(self, strategy='HTTP'):
+    def download_notebooks(self, strategy='HTTP', skip=0):
         """
         This method executes the download procedure using the provided strategy after checking the destination folder.
 
         Args:
             strategy:  The download strategy (``HTTP`` or ``API``). By default it is ``HTTP``.
+            skip: the number of notebooks to skip
         """
 
         self._check_destination_folder()
@@ -197,7 +207,7 @@ class Downloader:
 
         # HTTP STRATEGY
         if strategy is 'HTTP':
-            self._http_download()
+            self._http_download(skip=skip)
 
         # API STRATEGY
         elif strategy is 'API':
@@ -243,5 +253,5 @@ if __name__ == '__main__':
     print("** NOTEBOOK DOWNLOAD STARTED **")
     print("*******************************")
     print(f'# Selected strategy. {strategies[0]}')
-    downloader.download_notebooks(strategy=strategies[0])
+    downloader.download_notebooks(strategy=strategies[0], skip=len(glob.glob1(os.getcwd(),"*.ipynb")))
     print('## Download finished.')
