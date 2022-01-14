@@ -16,6 +16,7 @@ from KGTorrent.db_communication_handler import DbCommunicationHandler
 
 import glob
 import os
+import re
 
 class Downloader:
     """
@@ -102,8 +103,15 @@ class Downloader:
         idx = -1
 
         for row in tqdm(self._nb_identifiers.itertuples(), total=self._nb_identifiers.shape[0]):
-            idx += 1
-            if idx < skip:
+            print("-----")
+            print(row[1])
+            print(row[2])
+            print(row[3])
+            filename = re.sub(r'[+\'"?#$%^*@!/\\`~|:;\]\[-]+', '', f'{row[1]}_{row[2]}')
+            print(filename)
+            print("-----")
+            download_path = self._nb_archive_path + f'/{filename}.ipynb'
+            if os.path.exists(download_path):
                 self._n_successful_downloads += 1
                 continue
 
@@ -113,19 +121,12 @@ class Downloader:
             # Download notebook content to memory
             # noinspection PyBroadException
             try:
-
-                # cookies = {
-                #     '.ASPXAUTH': '7516769A1C8A8FE81812467ABC3B801EA35B55F32761F27BA27A2F2AC992F856C07757302E3165502C19EE3E4E232023C9AC85B7E9225F6370D8A971A4E85AF48A142A4B2554053190BEB19B485CD0403DD4F4F8',
-                #     'ka_sessionid': 'e179d3cb492015052b50858ff1c529e0aab117c9',
-                #     '_ga': 'GA1.2.908532115.1613499167',
-                # }
-
                 cookies = {
-                    '.ASPXAUTH': '2656A0B5422BFF8AF3E2FE87BBB9D34666563EEA51C5AEBDC483A737B52B1A26A10596ABAB84E815A566896C040999059571590A2391B86FB544FDA27696FC98F9176387B91FC644E4316BC0D1348444DD1C11EF',
-                    'CLIENT_TOKEN': 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpc3MiOiJrYWdnbGUiLCJhdWQiOiJjbGllbnQiLCJzdWIiOiJ6aGVuZ21pbnlhbmciLCJuYnQiOiIyMDIxLTA2LTE3VDE4OjU2OjUwLjY0MjEwMjRaIiwiaWF0IjoiMjAyMS0wNi0xN1QxODo1Njo1MC42NDIxMDI0WiIsImp0aSI6IjU0YWNiYjU1LTUxMjAtNDljMi04ZGMwLWYzMDgwZGJiZTBiNyIsImV4cCI6IjIwMjEtMDctMTdUMTg6NTY6NTAuNjQyMTAyNFoiLCJ1aWQiOjY0OTk2NTQsImZmIjpbIkRvY2tlck1vZGFsU2VsZWN0b3IiLCJBY3RpdmVFdmVudHMiLCJHY2xvdWRLZXJuZWxJbnRlZyIsIktlcm5lbEVkaXRvckNvcmdpTW9kZSIsIkNhaXBFeHBvcnQiLCJDYWlwTnVkZ2UiLCJLZXJuZWxzRmlyZWJhc2VMb25nUG9sbGluZyIsIktlcm5lbHNQcmV2ZW50U3RvcHBlZFRvU3RhcnRpbmdUcmFuc2l0aW9uIiwiS2VybmVsc1BvbGxRdW90YSIsIktlcm5lbHNRdW90YU1vZGFscyIsIkRhdGFzZXRzRGF0YUV4cGxvcmVyVjNUcmVlTGVmdCIsIkF2YXRhclByb2ZpbGVQcmV2aWV3IiwiRGF0YXNldHNEYXRhRXhwbG9yZXJWM0NoZWNrRm9yVXBkYXRlcyIsIkRhdGFzZXRzRGF0YUV4cGxvcmVyVjNDaGVja0ZvclVwZGF0ZXNJbkJhY2tncm91bmQiLCJLZXJuZWxzU3RhY2tPdmVyZmxvd1NlYXJjaCIsIktlcm5lbHNNYXRlcmlhbExpc3RpbmciLCJEYXRhc2V0c01hdGVyaWFsRGV0YWlsIiwiRGF0YXNldHNNYXRlcmlhbExpc3RDb21wb25lbnQiLCJDb21wZXRpdGlvbkRhdGFzZXRzIiwiRGlzY3Vzc2lvbnNVcHZvdGVTcGFtV2FybmluZyIsIlRhZ3NFeHBlcmltZW50VUkiLCJUYWdzTGVhcm5BbmREaXNjdXNzaW9uc1VJIiwiTm9SZWxvYWRFeHBlcmltZW50IiwiTm90ZWJvb2tzTGFuZGluZ1BhZ2UiLCJEYXRhc2V0c0Zyb21HY3MiLCJLZXJuZWxzTGVzc1JhcGlkQXV0b1NhdmUiLCJMZWFybkxhbmRpbmdLTSIsIkJvb2ttYXJrc1VJIiwiQm9va21hcmtzQ29tcHNVSSIsIkNvbXBldGl0aW9uc0ttTGFuZGluZyIsIktlcm5lbFZpZXdlckhpZGVGYWtlRXhpdExvZ1RpbWUiLCJEYXRhc2V0TGFuZGluZ1BhZ2VSb3RhdGluZ1NoZWx2ZXMiLCJMZWFybkxhbmRpbmdEZWZhdWx0TGlzdCIsIkxvd2VyRGF0YXNldEhlYWRlckltYWdlTWluUmVzIiwiS01MZWFybkxhbmRpbmdUZXN0IiwiS01MZWFybkxhbmRpbmdUZXN0VmVyc2lvbkIiXSwicGlkIjoia2FnZ2xlLTE2MTYwNyIsInN2YyI6IndlYi1mZSIsInNkYWsiOiJBSXphU3lBNGVOcVVkUlJza0pzQ1pXVnotcUw2NTVYYTVKRU1yZUUiLCJibGQiOiJkYmRlYTQyODYwMjM4ZTZiY2EwM2QyMTUzZmYzZTdmMTc3OWNmNDYxIn0.',
-                    'CSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL-GSFUhhm55gMh4qVwgoN6VcDzKRJu3BLX1PwHQj_jDW3PMQCeYY5W5CPG95xBYbpByaLDMttyWHqKMy2HSbPXCKlRnRyFir3hjJnDwK3uBjCIGLWb05E6MmbE84eYkQC4',
-                    'GCLB': 'CJ60sbjq3tGpUA',
-                    'XSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL8vmotCo64cSevITk9iGUEAclAfItyAq4mjPpRL4if23Ly-EPLqU3XnnSwB3_dOwR1nqM77PGzNnD5cqKPoiHIAM1Jl8LDu0UJulcu7XjsRJEwnHI-DD4JAzoPJJ3RIQeemnCqryHRYpJLSSSb_eQcqvDXaMbGSPw0yS7nHkHqYbA',
+                    '.ASPXAUTH': 'CD65DB83B31EEED511B518610C82E13397E96A7C2CA4A0175D4F0A0DE73957E1CD713389573DCE8E29DE4B918056C67C79AA325C5251C8258FD72A2AAD177DDD9D6F8121AF335A4F86E2855CB46A52273C858595',
+                    'CLIENT_TOKEN': 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpc3MiOiJrYWdnbGUiLCJhdWQiOiJjbGllbnQiLCJzdWIiOiJ6aGVuZ21pbnlhbmciLCJuYnQiOiIyMDIxLTA3LTA5VDEzOjA3OjIzLjExODY4NjVaIiwiaWF0IjoiMjAyMS0wNy0wOVQxMzowNzoyMy4xMTg2ODY1WiIsImp0aSI6ImNiNmQwNjUyLThlZjktNGRiNy1iYzQ4LTNmYTllMTY1NjE4NyIsImV4cCI6IjIwMjEtMDgtMDlUMTM6MDc6MjMuMTE4Njg2NVoiLCJ1aWQiOjY0OTk2NTQsImZmIjpbIkRvY2tlck1vZGFsU2VsZWN0b3IiLCJBY3RpdmVFdmVudHMiLCJHY2xvdWRLZXJuZWxJbnRlZyIsIktlcm5lbEVkaXRvckNvcmdpTW9kZSIsIkNhaXBFeHBvcnQiLCJDYWlwTnVkZ2UiLCJLZXJuZWxzRmlyZWJhc2VMb25nUG9sbGluZyIsIktlcm5lbHNQcmV2ZW50U3RvcHBlZFRvU3RhcnRpbmdUcmFuc2l0aW9uIiwiS2VybmVsc1BvbGxRdW90YSIsIktlcm5lbHNRdW90YU1vZGFscyIsIkRhdGFzZXRzRGF0YUV4cGxvcmVyVjNUcmVlTGVmdCIsIkF2YXRhclByb2ZpbGVQcmV2aWV3IiwiRGF0YXNldHNEYXRhRXhwbG9yZXJWM0NoZWNrRm9yVXBkYXRlcyIsIkRhdGFzZXRzRGF0YUV4cGxvcmVyVjNDaGVja0ZvclVwZGF0ZXNJbkJhY2tncm91bmQiLCJLZXJuZWxzU3RhY2tPdmVyZmxvd1NlYXJjaCIsIktlcm5lbHNNYXRlcmlhbExpc3RpbmciLCJEYXRhc2V0c01hdGVyaWFsRGV0YWlsIiwiRGF0YXNldHNNYXRlcmlhbExpc3RDb21wb25lbnQiLCJDb21wZXRpdGlvbkRhdGFzZXRzIiwiRGlzY3Vzc2lvbnNVcHZvdGVTcGFtV2FybmluZyIsIlRhZ3NMZWFybkFuZERpc2N1c3Npb25zVUkiLCJOb1JlbG9hZEV4cGVyaW1lbnQiLCJOb3RlYm9va3NMYW5kaW5nUGFnZSIsIkRhdGFzZXRzRnJvbUdjcyIsIlRQVUNvbW1pdFNjaGVkdWxpbmciLCJDb21taXRTY2hlZHVsaW5nIiwiRW1haWxTaWdudXBOdWRnZXMiLCJLZXJuZWxzTGVzc1JhcGlkQXV0b1NhdmUiLCJMZWFybkxhbmRpbmdLTSIsIkJvb2ttYXJrc1VJIiwiQm9va21hcmtzQ29tcHNVSSIsIkNvbXBldGl0aW9uc0ttTGFuZGluZyIsIktlcm5lbFZpZXdlckhpZGVGYWtlRXhpdExvZ1RpbWUiLCJEYXRhc2V0TGFuZGluZ1BhZ2VSb3RhdGluZ1NoZWx2ZXMiLCJMZWFybkxhbmRpbmdEZWZhdWx0TGlzdCIsIkxvd2VyRGF0YXNldEhlYWRlckltYWdlTWluUmVzIiwiTmV3RGlzY3Vzc2lvbnNMYW5kaW5nIiwiTmV3RGlzY3Vzc2lvbnNMYW5kaW5nMkxpbmUiLCJEaXNjdXNzaW9uTGlzdGluZ0ltcHJvdmVtZW50cyIsIktNTGVhcm5MYW5kaW5nVGVzdCIsIktNTGVhcm5MYW5kaW5nVGVzdFZlcnNpb25CIl0sInBpZCI6ImthZ2dsZS0xNjE2MDciLCJzdmMiOiJ3ZWItZmUiLCJzZGFrIjoiQUl6YVN5QTRlTnFVZFJSc2tKc0NaV1Z6LXFMNjU1WGE1SkVNcmVFIiwiYmxkIjoiZjhjNDIzZmMwYzVlOGJlNjU1YWI5MTQ3NGY2ZTY2M2EwZDcwODRiMCJ9.',
+                    'CSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL97tIVoIPtTGWtRoHNqCnPabvsqC33TcUIdE7EV2TsfI7RB7GcZqjC8q06L6o_hK5KFqi5pvL4U3Kr4t9-51TV5dLO7kGbcUdcYURbHki53UkxUcMCrED-7ACQOYj_iJo8',
+                    'GCLB': 'CMHN55bZ8Y7s5AE',
+                    'XSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL9LpNulqfj49z0t-c_lhr-zmvjkWakcjkdRrADuCAOkU5ZbX7a_6G7Ykb1_bMV-Xdaf6nAfBWD_lznX0b2Hd-Y7ZclRCYqr23jlvBrub9i1OMrpC3Govpg4N3h4KwOUvcz1kHoUhuYmoMEP7pYJ1vVD57-sMnSMzoS8p_pGDBQ5hQ',
                     'ka_sessionid': 'd1fc32396914f933968b1a422c2b348d',
                 }
 
@@ -142,7 +143,10 @@ class Downloader:
                 continue
 
             # Write notebook in folder
-            download_path = self._nb_archive_path + f'/{row[1]}_{row[2]}.ipynb'
+            filename = re.sub(r'[+\'"?#$%^*@!/\\`~|:;\]\[-]+', '', f'{row[1]}_{row[2]}')
+            download_path = self._nb_archive_path + f'/{filename}.ipynb'
+            print(download_path)
+
             with open(Path(download_path), 'wb') as notebook_file:
                 notebook_file.write(notebook.content)
 
@@ -230,7 +234,6 @@ class Downloader:
 
 
 if __name__ == '__main__':
-    num_repos = 10
     print(f"## Connecting to {config.db_name} db on port {config.db_port} as user {config.db_username}")
     db_engine = DbCommunicationHandler(config.db_username,
                                        config.db_password,
@@ -239,7 +242,7 @@ if __name__ == '__main__':
                                        config.db_name)
 
     print("** QUERING KERNELS TO DOWNLOAD **")
-    kernels_ids = db_engine.get_nb_identifiers(config.nb_conf['languages'], num_notebooks=num_repos)
+    kernels_ids = db_engine.get_nb_identifiers(config.nb_conf['languages'])
 
     #downloader = Downloader(kernels_ids.head(num_notebooks), config.nb_archive_path)
     #kernels_ids.head(num_notebooks).to_excel("notebooks_info.xlsx")
@@ -247,11 +250,10 @@ if __name__ == '__main__':
     kernels_ids.to_excel("notebooks_info.xlsx")
 
     strategies = 'HTTP', 'API'
-    #strategies = 'API', 'HTTP'
 
     print("*******************************")
     print("** NOTEBOOK DOWNLOAD STARTED **")
     print("*******************************")
     print(f'# Selected strategy. {strategies[0]}')
-    downloader.download_notebooks(strategy=strategies[0], skip=len(glob.glob1(os.getcwd(),"*.ipynb")))
+    downloader.download_notebooks(strategy=strategies[0], skip=len(glob.glob1(os.getcwd()+"\\notebooks\\","*.ipynb")))
     print('## Download finished.')

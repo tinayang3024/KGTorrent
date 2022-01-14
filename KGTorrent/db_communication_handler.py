@@ -471,7 +471,7 @@ class DbCommunicationHandler:
             except IntegrityError as e:
                 print("\t - INTEGRITY ERROR. Can't update table ", table_name, file=sys.stderr)
 
-    def get_nb_identifiers(self, languages, num_notebooks:int=1):
+    def get_nb_identifiers(self, languages):
         """
         This method queries the database in order to retrieve slugs and identifiers of notebooks
         written in the provided languages.
@@ -484,48 +484,11 @@ class DbCommunicationHandler:
         """
 
         # Prepare the query
-        query = 'select concat(users.UserName, \'_\', all_top_versions.nbtitle) as UserName, all_top_versions.versionnum as CurrentUrlSlug, all_top_versions.versionid from ' \
-                '((users join ' \
-                '(select kernelversions.AuthorUserId as userid, kernelversions.Title as nbtitle, kernelversions.VersionNumber as versionnum, kernelversions.Id as versionid, kernelversions.ScriptLanguageId as language from ' \
-                'kernelversions join ' \
-                '(select kernelversions.AuthorUserId, kernelversions.ScriptId, kernelversions.VersionNumber from kernelversions join ' \
-                '(select AuthorUserId, ScriptId, max(TotalVotes) as MaxVotes from kernelversions group by AuthorUserId, ScriptId) as MaxPossible ' \
-                'on kernelversions.AuthorUserId=MaxPossible.AuthorUserId and kernelversions.TotalVotes=MaxPossible.MaxVotes and kernelversions.ScriptId=MaxPossible.ScriptId ' \
-                'order by kernelversions.TotalVotes desc limit '+str(num_notebooks)+') ' \
-                'as top_kernels ' \
-                'on kernelversions.ScriptId=top_kernels.ScriptId and kernelversions.AuthorUserId=top_kernels.AuthorUserId) ' \
-                'as all_top_versions ' \
-                'on users.Id=all_top_versions.userid) join ' \
-                'kernellanguages on kernellanguages.Id=all_top_versions.language) ' \
-                'where '
-
-        # query = 'SELECT ' \
-        #         'users.UserName, ' \
-        #         'kernels.CurrentUrlSlug, ' \
-        #         'kernels.CurrentKernelVersionId ' \
-        #         'FROM ' \
-        #         '(((kernels INNER JOIN users ON kernels.AuthorUserId = users.Id) ' \
-        #         'INNER JOIN kernelversions ON kernels.CurrentKernelVersionId = kernelversions.Id) ' \
-        #         'INNER JOIN kernellanguages ON kernelversions.ScriptLanguageId = kernellanguages.Id) ' \
-        #         f'WHERE '
-
-        #query = query + f'('
-        # Add where clause for each language
-        for lang in languages:
-
-            if lang is languages[0]:
-                query = query + f'kernellanguages.name LIKE \'{lang}\' '
-
-            else:
-                query = query + f'OR kernellanguages.name LIKE \'{lang}\' '
-
-        #query = query + f')'
-        # Select forks only
-        # TODO: delete forking criteria and look at a larger set sort by votes
-        #query = query + f'AND (kernelversions.LinesInsertedFromFork > 0 OR kernelversions.LinesChangedFromFork > 0 OR kernelversions.LinesDeletedFromFork > 0) ORDER BY kernelversions.TotalVotes desc LIMIT 50'
+        query = 'select concat(u.UserName, \'_\', kv.Title) as UserName, kv.VersionNumber as CurrentUrlSlug, kv.Id as CurrentKernelVersionId from kernelversions kv join users u join kernellanguages kl on kv.AuthorUserId = u.Id and kv.ScriptLanguageId = kl.Id where kv.ScriptId in (select kv2.ScriptId from kernelversions kv2 where kv2.Id = 30847187) and kv.VersionNumber IS NOT NULL'
 
         # Close the query
         query = query + ';'
+        print(query)
 
         # Execute the query
         nb_identifiers = pd.read_sql(sql=query, con=self._engine)
