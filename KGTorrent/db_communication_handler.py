@@ -5,7 +5,8 @@ This module defines the class that handles the communication with the database v
 import sys
 from sqlalchemy.exc import IntegrityError
 
-from KGTorrent.exceptions import DatabaseExistsError
+# from KGTorrent.exceptions import DatabaseExistsError
+from exceptions import DatabaseExistsError
 
 import pandas as pd
 
@@ -21,10 +22,12 @@ from sqlalchemy import (MetaData, Table, Column, Integer, String, Float,
 from sqlalchemy.dialects.mysql import (MEDIUMTEXT, LONGTEXT)
 
 # Imports for testing
-import KGTorrent.config as config
-from KGTorrent.mk_preprocessor import MkPreprocessor
-from KGTorrent.data_loader import DataLoader
-
+# import KGTorrent.config as config
+# from KGTorrent.mk_preprocessor import MkPreprocessor
+# from KGTorrent.data_loader import DataLoader
+import config as config
+from mk_preprocessor import MkPreprocessor
+from data_loader import DataLoader
 
 class DbCommunicationHandler:
     """
@@ -502,6 +505,9 @@ class DbCommunicationHandler:
 
             else:
                 query = query + f'OR kernellanguages.name LIKE \'{lang}\' '
+
+        # limit the number to test the script
+        query += "LIMIT 5"
 
         # Close the query
         query = query + ';'

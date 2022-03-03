@@ -11,24 +11,33 @@ import os
 import time
 
 # MySQL DB configuration
-db_host = os.environ['DB_HOST']
-db_port = os.environ['DB_PORT']
-db_name = os.environ['DB_NAME']
-db_username = os.environ['MYSQL_USER']
-db_password = os.environ['MYSQL_PWD']
+# db_host = os.environ['DB_HOST']
+# db_port = os.environ['DB_PORT']
+# db_name = os.environ['DB_NAME']
+# db_username = os.environ['MYSQL_USER']
+# db_password = os.environ['MYSQL_PWD']
+db_host = 'localhost'
+db_port = '3308'
+db_name = 'kgtorrent'
+db_username = 'dyyang'
+db_password = 'RS5NlOHN'
 
 # Data paths
-meta_kaggle_path = os.environ['METAKAGGLE_PATH']
+# meta_kaggle_path = os.environ['METAKAGGLE_PATH']
+meta_kaggle_path = "./tmp/"
 constraints_file_path = '../data/fk_constraints_data.csv'
 
 # Notebook dataset configuration
-nb_archive_path = os.environ['NB_DEST_PATH']
+# nb_archive_path = os.environ['NB_DEST_PATH']
+nb_archive_path = '/mnt/e/School/ECE499/KGTorrent/downloads/notebooks'
 nb_conf = {
     'languages': ['IPython Notebook HTML']
 }
 
 # Logging Configuration
-log_path = os.environ['LOG_DEST_PATH']
+# log_path = os.environ['LOG_DEST_PATH']
+log_path = '/mnt/e/School/ECE499/KGTorrent/downloads/logs'
+
 logging.basicConfig(
     filename=os.path.join(log_path, f'{time.time()}.log'),
     filemode='w',

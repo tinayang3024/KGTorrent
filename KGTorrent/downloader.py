@@ -8,11 +8,14 @@ from pathlib import Path
 from tqdm import tqdm
 
 import requests
-from kaggle.api.kaggle_api_extended import KaggleApi
+# from kaggle.api.kaggle_api_extended import KaggleApi
 
 # Imports for testing
-import KGTorrent.config as config
-from KGTorrent.db_communication_handler import DbCommunicationHandler
+# import KGTorrent.config as config
+# from KGTorrent.db_communication_handler import DbCommunicationHandler
+import config as config
+
+from db_communication_handler import DbCommunicationHandler
 
 
 class Downloader:
@@ -180,12 +183,14 @@ class Downloader:
         time.sleep(1)
 
         # HTTP STRATEGY
-        if strategy is 'HTTP':
+        if strategy == 'HTTP':
             self._http_download()
 
         # API STRATEGY
-        if strategy is 'API':
-            self._api_download()
+        if strategy == 'API':
+            # self._api_download()
+            print("nope:(")
+            exit()
 
         # Print download session summary
         # Print summary to stdout
@@ -211,8 +216,10 @@ if __name__ == '__main__':
 
     print("** QUERING KERNELS TO DOWNLOAD **")
     kernels_ids = db_engine.get_nb_identifiers(config.nb_conf['languages'])
+    print("** kernels_ids **")
 
     downloader = Downloader(kernels_ids.head(), config.nb_archive_path)
+    print("** downloader **")
     strategies = 'HTTP', 'API'
 
     print("*******************************")
