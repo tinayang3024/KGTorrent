@@ -4,7 +4,7 @@ This module defines the class that handles the communication with the database v
 
 import sys
 from sqlalchemy.exc import IntegrityError
-
+from sqlalchemy import create_engine, text
 # from KGTorrent.exceptions import DatabaseExistsError
 from exceptions import DatabaseExistsError
 
@@ -486,35 +486,16 @@ class DbCommunicationHandler:
             nb_identifiers: The ``pandas.DataFrame`` containing notebook slugs and identifiers.
         """
 
-        # Prepare the query
-        query = 'SELECT ' \
-                'users.UserName, ' \
-                'kernels.CurrentUrlSlug, ' \
-                'kernels.CurrentKernelVersionId ' \
-                'FROM ' \
-                '(((kernels INNER JOIN users ON kernels.AuthorUserId = users.Id) ' \
-                'INNER JOIN kernelversions ON kernels.CurrentKernelVersionId = kernelversions.Id) ' \
-                'INNER JOIN kernellanguages ON kernelversions.ScriptLanguageId = kernellanguages.Id) ' \
-                f'WHERE '
-
-        # Add where clause for each language
-        for lang in languages:
-
-            if lang is languages[0]:
-                query = query + f'kernellanguages.name LIKE \'{lang}\' '
-
-            else:
-                query = query + f'OR kernellanguages.name LIKE \'{lang}\' '
-
-        # limit the number to test the script
-        query += "LIMIT 5"
-
-        # Close the query
-        query = query + ';'
+        cmd = ""
+        with open('./predict_query.sql', 'r') as f:
+            for line in f:
+                cmd += line
+        # print("cmd:" + str(cmd))
+        query = cmd
 
         # Execute the query
-        nb_identifiers = pd.read_sql(sql=query, con=self._engine)
-
+        nb_identifiers = pd.read_sql(sql=text(query), con=self._engine)
+        print("nb_identifiers.shape[0]:" + str(nb_identifiers.shape[0]))
         return nb_identifiers
 
 

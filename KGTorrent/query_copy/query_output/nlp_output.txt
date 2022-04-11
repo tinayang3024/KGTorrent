@@ -1,0 +1,21 @@
++---------------------------------------------------+-----------------+--------------------+---------------+------------+------------------------------------------------+----------------------------------------------------------------------+
+| title                                             | UserName        | displayname        | versionnumber | totallines | competitionTitle                               | competitionSubTitle
+                                       |
++---------------------------------------------------+-----------------+--------------------+---------------+------------+------------------------------------------------+----------------------------------------------------------------------+
+| DistillBert + Catalyst, amazon product reviews    | kashnitsky      | Yury Kashnitsky    |            11 |        447 | Amazon pet product reviews classification      | Explore semi-supervised and transfer learning for NLP                |
+| Intro to Boosting Models + Categorical data + NLP | akashram        | AR                 |            11 |       1247 | 2019 Data Science Bowl                         | Uncover the factors to help measure how young children learn         |
+| Intro to Boosting Models + Categorical data + NLP | akashram        | AR                 |            11 |       1247 | OSIC Pulmonary Fibrosis Progression            | Predict lung function decline 
+                                       |
+| Sentiment Analysis: Rotten Tomato Movie Reviews   | oragula         | Raivis J           |            12 |        471 | Sentiment Analysis on Movie Reviews            | Classify the sentiment of sentences from the Rotten Tomatoes dataset |
+| Ignite example                                    | protan          | Anton Protopopov   |            12 |        532 | DL in NLP Spring 2019. Classification          | Train a clickbait detector    
+                                       |
+| Real NLP Disaster Tweets                          | aman2000jaiswal | aman2000jaiswal    |            14 |        850 | Tweet Sentiment Extraction                     | Extract support phrases for sentiment labels                         |
+| CNN for Sentence Classification by Yoon Kim       | hamishdickson   | Hamish             |            15 |        511 | Movie Review Sentiment Analysis (Kernels Only) | Classify the sentiment of sentences from the Rotten Tomatoes dataset |
+| QA EDA and NLP Modelling - Insights&Vis&Bert      | kabure          | Leonardo Ferreira  |            16 |        888 | Google QUEST Q&A Labeling                      | Improving automated understanding of complex question answer content |
+| Google_Quest for NLP_V7                           | nandhuelan      | Nandhu Elango      |            16 |        771 | Google QUEST Q&A Labeling                      | Improving automated understanding of complex question answer content |
+| Fastai with ? Transformers (BERT, RoBERTa, ...)   | maroberti       | Maximilien Roberti |            17 |        588 | Sentiment Analysis on Movie Reviews            | Classify the sentiment of sentences from the Rotten Tomatoes dataset |
+| First NLP Analysis                                | kihunkim        | Kihun              |            18 |       1011 | Tweet Sentiment Extraction                     | Extract support phrases for sentiment labels                         |
+| Sentiment CNN, RNN-Atte, RNN-CNN, RNN-HierCNN     | keyit92         | Keyi Tang          |            19 |       1081 | Movie Review Sentiment Analysis (Kernels Only) | Classify the sentiment of sentences from the Rotten Tomatoes dataset |
+| Deep Learning for Sentiment Analysis - Top 25%    | josh24990       | Joshua Reed        |            20 |        433 | Movie Review Sentiment Analysis (Kernels Only) | Classify the sentiment of sentences from the Rotten Tomatoes dataset |
+| NLP text analytics - Quora Insincere Questions    | jmourad100      | JM100              |            23 |        500 | Quora Insincere Questions Classification       | Detect toxic content to improve online conversations                 |
++---------------------------------------------------+-----------------+--------------------+---------------+------------+------------------------------------------------+----------------------------------------------------------------------+

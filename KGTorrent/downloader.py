@@ -76,8 +76,7 @@ class Downloader:
 
             # check if the file have valid name
             if len(split) == 2:
-
-                # If the file exists in folder drop it from res
+                print("self._nb_identifiers:" + str(self._nb_identifiers.keys())) 
                 if (split[0] in self._nb_identifiers['UserName'].values) & \
                         (split[1] in self._nb_identifiers['CurrentUrlSlug'].values):
                     print('Notebook ', name, ' already downloaded')
@@ -107,7 +106,18 @@ class Downloader:
             # Download notebook content to memory
             # noinspection PyBroadException
             try:
-                notebook = requests.get(url, allow_redirects=True, timeout=5)
+                # notebook = requests.get(url, allow_redirects=True, timeout=5)
+
+                cookies = {
+                    '.ASPXAUTH': 'EBFBA39C84DEC4C1C74F847C55A7477EF4BF3BD3EA959747B274DCCB9992D46CEA57C1477A71DE100F358330F21224BA7895117417551B32EFE07CAA2B43E48C203E0C3E53F63CADC2CD6D1866F7366F624CDC66',
+                    'CLIENT_TOKEN': 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpc3MiOiJrYWdnbGUiLCJhdWQiOiJjbGllbnQiLCJzdWIiOiJ0aW5heWFuZzMwMjQiLCJuYnQiOiIyMDIyLTAzLTEwVDE3OjMyOjUwLjIyOTkyODVaIiwiaWF0IjoiMjAyMi0wMy0xMFQxNzozMjo1MC4yMjk5Mjg1WiIsImp0aSI6IjI5M2VmYzY4LTJhOTQtNGZkNy05ZGViLTk1YTI2M2QyNmNkMyIsImV4cCI6IjIwMjItMDQtMTBUMTc6MzI6NTAuMjI5OTI4NVoiLCJ1aWQiOjk0MjQ3MjcsImRpc3BsYXlOYW1lIjoidGluYXlhbmczMDI0IiwiZW1haWwiOiJ0aW5heWFuZzMwMjRAZ21haWwuY29tIiwidGllciI6Ik5vdmljZSIsInZlcmlmaWVkIjp0cnVlLCJwcm9maWxlVXJsIjoiL3RpbmF5YW5nMzAyNCIsInRodW1ibmFpbFVybCI6Imh0dHBzOi8vc3RvcmFnZS5nb29nbGVhcGlzLmNvbS9rYWdnbGUtYXZhdGFycy90aHVtYm5haWxzL2RlZmF1bHQtdGh1bWIucG5nIiwiZmYiOlsiS2VybmVsc1NhdmVUb0dpdEh1YiIsIkdjbG91ZEtlcm5lbEludGVnIiwiS2VybmVsRWRpdG9yS2l0dHlNb2RlIiwiQ2FpcEV4cG9ydCIsIkNhaXBOdWRnZSIsIktlcm5lbHNGaXJlYmFzZUxvbmdQb2xsaW5nIiwiS2VybmVsc1BvbGxRdW90YSIsIkRhdGFzZXRzRGF0YUV4cGxvcmVyVjNDaGVja0ZvclVwZGF0ZXMiLCJEYXRhc2V0c0RhdGFFeHBsb3JlclYzQ2hlY2tGb3JVcGRhdGVzSW5CYWNrZ3JvdW5kIiwiS2VybmVsc1N0YWNrT3ZlcmZsb3dTZWFyY2giLCJLZXJuZWxzTWF0ZXJpYWxMaXN0aW5nIiwiS2VybmVsc0VtcHR5U3RhdGUiLCJLZXJuZWxWaWV3ZXJSZXF1ZXN0U291cmNlRnJvbUZyb250ZW5kIiwiRGF0YXNldHNNYXRlcmlhbExpc3RDb21wb25lbnQiLCJEYXRhc2V0c1NoYXJlZFdpdGhZb3UiLCJDb21wZXRpdGlvbkRhdGFzZXRzIiwiVFBVQ29tbWl0U2NoZWR1bGluZyIsIktlcm5lbEVkaXRvckZvcmNlVGhlbWVTeW5jIiwiS01MZWFybkRldGFpbCIsIkZyb250ZW5kRXJyb3JSZXBvcnRpbmciLCJGcm9udGVuZENvbnNvbGVFcnJvclJlcG9ydGluZyIsIkxvd2VyRGF0YXNldEhlYWRlckltYWdlTWluUmVzIiwiRGlzY3Vzc2lvbkVtcHR5U3RhdGUiLCJGaWx0ZXJGb3J1bUltYWdlcyIsIlBob25lVmVyaWZ5Rm9yQ29tbWVudHMiLCJQaG9uZVZlcmlmeUZvck5ld1RvcGljIiwiTmV3TmF2QmVoYXZpb3IiLCJOZXdOYXZVc2VyTGlua3MiLCJOZXdLbUxlYWRlcmJvYXJkIiwiSW5DbGFzc1RvQ29tbXVuaXR5UGFnZXMiLCJQaG9uZVZlcmlmaWNhdGlvbk9sZEZsb3dzTmV3VWkiXSwiZmZkIjp7Iktlcm5lbEVkaXRvckF1dG9zYXZlVGhyb3R0bGVNcyI6IjMwMDAwIiwiRnJvbnRlbmRFcnJvclJlcG9ydGluZ1NhbXBsZVJhdGUiOiIwLjAxIiwiRW1lcmdlbmN5QWxlcnRCYW5uZXIiOiJ7XCJiYW5uZXJzXCI6IFt7XCJ1cmlQYXRoUmVnZXhcIjogXCJeKC8uKilcIiwgXCJtZXNzYWdlSHRtbFwiOiBcIkthZ2dsZSByZWNlbnRseSBlbmFjdGVkIGEgbm90ZWJvb2tzIGFidXNlIGNvdW50ZXJtZWFzdXJlIHdoaWNoIHJlc3VsdGVkIGluIGEgbGFyZ2UgbnVtYmVyIG9mIGZhbHNlIGFjY291bnQgYmxvY2tzLiBXZSBoYXZlIGNvcnJlY3RlZCB0aGUgaXNzdWUgYW5kIGFyZSB3b3JraW5nIG9uIHVuYmxvY2tpbmcgdGhlIGFmZmVjdGVkIGFjY291bnRzLiBJdCBpcyBzYWZlIHRvIHJ1biBub3RlYm9va3MgYWdhaW4gYW5kIHdlIGFwb2xvZ2l6ZSBmb3IgdGhlIGluY29udmVuaWVuY2UuIDxhIGhyZWY9XFxcIi9wcm9kdWN0LWZlZWRiYWNrLzI5OTk4OFxcXCI-U2VlIGhlcmUgZm9yIG1vcmUgaW5mbzwvYT5cIiwgIFwiYmFubmVySWRcIjogXCIyMDIyLTAxLTEwLWtlcm5lbC1mYWxzZS1wb3NpdGl2ZS1hYnVzZVwiIH0gXSB9IiwiQ2xpZW50UnBjUmF0ZUxpbWl0IjoiNDAiLCJGZWF0dXJlZENvbW11bml0eUNvbXBldGl0aW9ucyI6IjMzNjExLDMzNjg5LDM0MTg5IiwiQWRkRmVhdHVyZUZsYWdzVG9QYWdlTG9hZFRhZyI6ImRhdGFzZXRzTWF0ZXJpYWxEZXRhaWwifSwicGlkIjoia2FnZ2xlLTE2MTYwNyIsInN2YyI6IndlYi1mZSIsInNkYWsiOiJBSXphU3lBNGVOcVVkUlJza0pzQ1pXVnotcUw2NTVYYTVKRU1yZUUiLCJibGQiOiJhMmNiYWI4MjU0MTk4YzEzNWIyZTkzZTBkOTlmNDA3MWJjNWMwNjZjIn0.',
+                    'CSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL8jeVqwKA97sY801PYVdrfeJQRxYSZiVQkDslP_e7v__Y8KQPR7AYxoUsOTreDnZWqcvXNWipjBpyuCm_-sLAc_k3KUdIyPECQe7_jOix7_KDE4rbosL3tIA9YkiAu2sdc',
+                    'GCLB': 'CNWm97e3kvSOHA',
+                    'XSRF-TOKEN': 'CfDJ8LdUzqlsSWBPr4Ce3rb9VL8a33Fc6Q7CRzvKQWBOHF6AWx1McsE7Ro6Nj2bVINV7sxGcmBrWdvwhOF5CM-3AL1cm4AxXLoEG7ZRnKUwQnUywWZGhkkDyC6F1azmAalEeruWp_GPSJde8-819unI8K2iWojwSbfsX_h5D03KnSpc5bl3ZbuXKbX5OKcgZ9BAaig',
+                    'ka_sessionid': 'f2f02568fe8268d4531360cb89243c50',
+                }
+
+                notebook = requests.get(url, allow_redirects=True, timeout=5, cookies=cookies)
 
             except requests.exceptions.HTTPError:
                 logging.exception(f'HTTPError while requesting the notebook at: "{url}"')
@@ -121,8 +131,14 @@ class Downloader:
 
             # Write notebook in folder
             download_path = self._nb_archive_path + f'/{row[1]}_{row[2]}.ipynb'
-            with open(Path(download_path), 'wb') as notebook_file:
-                notebook_file.write(notebook.content)
+            try:
+                with open(Path(download_path), 'wb') as notebook_file:
+                    notebook_file.write(notebook.content)
+            except Exception:
+                print("path invalid: " + str(Path(download_path)))
+                self._n_failed_downloads += 1
+                print("skipped... ")
+                continue
 
             self._n_successful_downloads += 1
             logging.info(f'Downloaded {row[1]}/{row[2]} (ID: {row[3]})')
@@ -206,7 +222,6 @@ class Downloader:
 
 
 if __name__ == '__main__':
-
     print(f"## Connecting to {config.db_name} db on port {config.db_port} as user {config.db_username}")
     db_engine = DbCommunicationHandler(config.db_username,
                                        config.db_password,
@@ -218,7 +233,7 @@ if __name__ == '__main__':
     kernels_ids = db_engine.get_nb_identifiers(config.nb_conf['languages'])
     print("** kernels_ids **")
 
-    downloader = Downloader(kernels_ids.head(), config.nb_archive_path)
+    downloader = Downloader(kernels_ids.head(200), config.nb_archive_path)
     print("** downloader **")
     strategies = 'HTTP', 'API'
 

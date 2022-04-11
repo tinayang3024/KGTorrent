@@ -16,6 +16,7 @@ import time
 # db_name = os.environ['DB_NAME']
 # db_username = os.environ['MYSQL_USER']
 # db_password = os.environ['MYSQL_PWD']
+# db_host = '127.0.0.1'
 db_host = 'localhost'
 db_port = '3308'
 db_name = 'kgtorrent'
